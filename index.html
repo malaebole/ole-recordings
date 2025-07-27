@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Playlist Player</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎬 Video Playlist</h1>
+      <div class="video-wrapper">
+        <video id="player" controls muted autoplay></video>
+        <div id="video-details">Test</div>
+        <div class="controls">
+          <button onclick="toggleMute()">🔊</button>
+          <button onclick="enterPiP()">📺 PiP</button>
+          <button onclick="downloadVideo()">⬇️ Download</button>
+        </div>
+      </div>
+      <div id="playlist" class="playlist"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
