@@ -20,12 +20,12 @@ function renderPlaylist() {
     return;
   }
 
-  loader.classList.remove("hidden");
+  loader.classList.remove("hidden"); // Show Loader
 
   fetch(`http://15.207.205.103:5000/api/recordings?booking_id=${bookingId}`)
     .then((response) => response.json())
     .then(({ data }) => {
-      loader.classList.add("hidden");
+      loader.classList.add("hidden"); // Hide Loader
 
       if (!Array.isArray(data) || data.length === 0) {
         playlistContainer.innerHTML =
@@ -57,7 +57,7 @@ function renderPlaylist() {
       loadVideo(0);
     })
     .catch((err) => {
-      console.error("Failed to fetch videos:", err);
+      console.error("Failed to fetch videos:", err); // Hide Loader
       loader.classList.add("hidden");
       playlistContainer.innerHTML = "<p>Error loading playlist.</p>";
     });
