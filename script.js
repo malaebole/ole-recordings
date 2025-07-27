@@ -22,7 +22,7 @@ function renderPlaylist() {
 
   loader.classList.remove("hidden"); // Show Loader
 
-  fetch(`http://15.207.205.103:5000/api/recordings?booking_id=${bookingId}`)
+  fetch(`https://recorder.ole-app.ae/api/recordings?booking_id=${bookingId}`)
     .then((response) => response.json())
     .then(({ data }) => {
       loader.classList.add("hidden"); // Hide Loader
