@@ -1,3 +1,4 @@
+const loader = document.getElementById("loader");
 const videoPlayer = document.getElementById("player");
 const videoDetailsContainer = document.getElementById("video-details");
 const playlistContainer = document.getElementById("playlist");
@@ -19,9 +20,13 @@ function renderPlaylist() {
     return;
   }
 
+  loader.classList.remove("hidden");
+
   fetch(`http://15.207.205.103:5000/api/recordings?booking_id=${bookingId}`)
     .then((response) => response.json())
     .then(({ data }) => {
+      loader.classList.add("hidden");
+
       if (!Array.isArray(data) || data.length === 0) {
         playlistContainer.innerHTML =
           "<p>No recordings found for this booking.</p>";
@@ -53,6 +58,7 @@ function renderPlaylist() {
     })
     .catch((err) => {
       console.error("Failed to fetch videos:", err);
+      loader.classList.add("hidden");
       playlistContainer.innerHTML = "<p>Error loading playlist.</p>";
     });
 }
