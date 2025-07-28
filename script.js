@@ -37,8 +37,12 @@ function currentDateTime() {
 function formatDateRange(startStr, endStr) {
   const startDate = parseCustomDate(startStr);
   const endDate = parseCustomDate(endStr);
-  if (!startDate || !endDate)
-    return { date: "Invalid date", time: "Invalid time" };
+  if (!startDate || !endDate) {
+    return {
+      date: "Invalid date",
+      time: "Invalid time",
+    };
+  }
 
   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -62,21 +66,22 @@ function formatDateRange(startStr, endStr) {
 }
 
 function parseCustomDate(str) {
-  const regex = /^(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)$/;
+  str = str.trim();
+  const regex = /^(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2}):(\d{2}) ?(AM|PM)$/i;
   const match = str.match(regex);
   if (!match) return null;
 
   let [_, year, month, day, hour, minute, second, period] = match;
 
   year = parseInt(year, 10);
-  month = parseInt(month, 10) - 1; // Month is 0-based in JS Date
+  month = parseInt(month, 10) - 1;
   day = parseInt(day, 10);
   hour = parseInt(hour, 10);
   minute = parseInt(minute, 10);
   second = parseInt(second, 10);
 
-  if (period === "PM" && hour !== 12) hour += 12;
-  if (period === "AM" && hour === 12) hour = 0;
+  if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
 
   return new Date(year, month, day, hour, minute, second);
 }
