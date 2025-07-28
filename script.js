@@ -1,7 +1,6 @@
 const loader = document.getElementById("loader");
 const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
-let recordedOnDate = "";
 let currentVideoIndex = 0;
 let videoList = [];
 
@@ -97,18 +96,14 @@ function renderPlaylist(category = "all") {
 
       videoList = data.map((item, index) => {
         const dateTime = formatDateRange(item.start_time, item.end_time);
-        if (index === 0) {
-          recordedOnDate = dateTime.date;
-        }
-        console.log(recordedOnDate);
-
         return {
           title: `Part ${index + 1}`,
           url: item.url,
           category: item?.category || "match",
           thumbnail: "thumbnail.png",
           live: false,
-          datetime: dateTime.time,
+          date: dateTime.date,
+          time: dateTime.time,
         };
       });
 
@@ -130,7 +125,7 @@ function renderPlaylist(category = "all") {
         item.innerHTML = `
           <img src="${video.thumbnail}" alt="${video.title}" />
           <div class="playlist-info">
-              <h3>${video.datetime}</h3>
+              <h3>${video.time}</h3>
           </div>`;
 
         playlistContainer.appendChild(item);
@@ -201,8 +196,9 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
 
 //document.getElementById("videoDate")
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("Video Date: ", recordedOnDate);
-  document.getElementById("videoDate").textContent = `${videoDate}`;
+  console.log("Video Date: ", videoList[currentVideoIndex].date);
+  document.getElementById("videoDate").textContent =
+    videoList[currentVideoIndex].date;
 });
 
 // Initialize on load
