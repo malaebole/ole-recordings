@@ -1,7 +1,7 @@
 const loader = document.getElementById("loader");
 const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
-let videoDate = "";
+let recordedOnDate = "";
 let currentVideoIndex = 0;
 let videoList = [];
 
@@ -96,9 +96,11 @@ function renderPlaylist(category = "all") {
       }
 
       videoList = data.map((item, index) => {
-        console.log(item);
         const dateTime = formatDateRange(item.start_time, item.end_time);
-        videoDate = dateTime.date;
+        if (index === 0) {
+          recordedOnDate = dateTime.date;
+        }
+        console.log(recordedOnDate);
 
         return {
           title: `Part ${index + 1}`,
@@ -187,6 +189,10 @@ function downloadVideo() {
 // Handle camera/category filter toggle
 document.querySelectorAll(".camera-option input").forEach((radio) => {
   radio.addEventListener("change", function () {
+    if (this.value === "cam2" || this.value === "live") {
+      alert("Coming soon... We are working on it.");
+      return;
+    }
     if (this.checked) {
       renderPlaylist(this.value);
     }
@@ -195,7 +201,7 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
 
 //document.getElementById("videoDate")
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("Video Date: ", videoDate);
+  console.log("Video Date: ", recordedOnDate);
   document.getElementById("videoDate").textContent = `${videoDate}`;
 });
 
