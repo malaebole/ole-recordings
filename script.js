@@ -46,12 +46,12 @@ function formatDateRange(startStr, endStr) {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 || 12;
-    return `${hours}:${minutes} ${ampm}`;
+    return `${hours}:${minutes}${ampm}`;
   };
 
   return {
     date: formatDate(startDate),
-    time: `${formatTime(startDate)} - ${formatTime(endDate)}`,
+    time: `${formatTime(startDate)}-${formatTime(endDate)}`,
   };
 }
 
@@ -126,7 +126,7 @@ function renderPlaylist(category = "all") {
         item.innerHTML = `
           <img src="${video.thumbnail}" alt="${video.title}" />
           <div class="playlist-info">
-              <h3>${video.time}</h3>
+              <h5>${video.time}</h5>
           </div>`;
 
         playlistContainer.appendChild(item);
