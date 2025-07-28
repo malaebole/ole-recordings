@@ -248,3 +248,9 @@ video {
 video::-webkit-media-controls {
   display: flex !important;
 }
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 0.9rem;
+  }
+}
