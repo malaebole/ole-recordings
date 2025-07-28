@@ -36,28 +36,25 @@ function getFormattedCurrentDateTime() {
   return formatted;
 }
 
-function formatDateRange(start, end) {
-  function parseAndFormat(dateStr) {
-    const [datePart, timePart, meridiem] = dateStr.split(" ");
-    const [day, month, year] = datePart.split("-");
-    const [h, m, s] = timePart.split(":");
-    let hour = parseInt(h, 10);
-    const minute = m.padStart(2, "0");
-    if (meridiem.toUpperCase() === "PM" && hour !== 12) hour += 12;
-    if (meridiem.toUpperCase() === "AM" && hour === 12) hour = 0;
-    const date = new Date(
-      `${year}-${month}-${day}T${hour.toString().padStart(2, "0")}:${minute}`
-    );
+function formatDateRange(startStr, endStr) {
+  const startDate = new Date(startStr);
+  const endDate = new Date(endStr);
 
-    const formattedDate = `${day}/${month}/${year}`;
-    const formattedHour = (date.getHours() % 12 || 12)
-      .toString()
-      .padStart(2, "0");
-    const formattedMinute = date.getMinutes().toString().padStart(2, "0");
-    const ampm = date.getHours() >= 12 ? "PM" : "AM";
-    return `${formattedDate} ${formattedHour}:${formattedMinute} ${ampm}`;
-  }
-  return `${parseAndFormat(start)} - ${parseAndFormat(end)}`;
+  const formatDate = (date, includeDate = true) => {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return includeDate
+      ? `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`
+      : `${hours}:${minutes} ${ampm}`;
+  };
+
+  return `${formatDate(startDate)} - ${formatDate(endDate, false)}`;
 }
 
 function renderPlaylist(category = "all") {
@@ -111,7 +108,7 @@ function renderPlaylist(category = "all") {
           <img src="${video.thumbnail}" alt="${video.title}" />
           <div class="playlist-info">
               <h3>${video.title}</h3>
-              <p>${video.datetime} @ ${video.datetime}</p>
+              <p>${video.category} @ ${video.datetime}</p>
               <p>${video.category === "live" ? "Live Feed" : "Match Video"}</p>
           </div>
           ${video.live ? '<div class="live-tag">LIVE</div>' : ""}
