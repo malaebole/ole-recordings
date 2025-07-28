@@ -158,10 +158,12 @@ function renderPlaylist(category = "all") {
 
 function loadVideo(index) {
   currentVideoIndex = index;
-  videoPlayer.type = "video/mp4";
   videoPlayer.src = videoList[index].url;
+  videoPlayer.muted = true;
   videoPlayer.load();
-  videoPlayer.play();
+  videoPlayer.play().catch((err) => {
+    console.warn("Autoplay prevented:", err);
+  });
 
   // Update active playlist item
   const items = document.querySelectorAll(".playlist-item");
