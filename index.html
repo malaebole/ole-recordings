@@ -3,22 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Video Playlist Player</title>
+    <title>OLE Professional Camera Videos</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
-      <h1>🎬 Video Playlist</h1>
-      <div class="video-wrapper">
-        <video id="player" controls muted autoplay></video>
-        <div id="video-details"></div>
-        <div class="controls">
-          <button onclick="toggleMute()">🔊</button>
-          <button onclick="enterPiP()">📺 PiP</button>
-          <button onclick="downloadVideo()">⬇️ Download</button>
+      <h1>🎬 OLE Player</h1>
+
+      <!-- Camera Selection -->
+      <div class="camera-selector">
+        <h2>Select Camera View</h2>
+        <div class="camera-options">
+          <label class="camera-option">
+            <input type="radio" name="camera" value="main" checked />
+            <div class="camera-icon">📹</div>
+            <div class="check-mark">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            </div>
+            <span class="camera-label">Main Camera</span>
+          </label>
+          <label class="camera-option">
+            <input type="radio" name="camera" value="match" />
+            <div class="camera-icon">🎥</div>
+            <div class="check-mark">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            </div>
+            <span class="camera-label">Second Camera</span>
+          </label>
+          <label class="camera-option">
+            <input type="radio" name="camera" value="live" />
+            <div class="camera-icon">🔴</div>
+            <div class="check-mark">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            </div>
+            <span class="camera-label">Live Feeds</span>
+          </label>
+          <label class="camera-option">
+            <input type="radio" name="camera" value="camera" />
+            <div class="camera-icon">🎥</div>
+            <div class="check-mark">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            </div>
+            <span class="camera-label">Coming Soon...</span>
+          </label>
         </div>
       </div>
-      <div id="playlist" class="playlist"></div>
+
+      <!-- Video Player -->
+      <div class="video-wrapper">
+        <video id="player" controls muted autoplay></video>
+      </div>
+
+      <!-- Playlist -->
+      <div class="playlist-container">
+        <h2>Video Playlist</h2>
+        <div id="playlist" class="playlist"></div>
+      </div>
     </div>
 
     <div id="loader" class="loader hidden">Loading recordings...</div>
