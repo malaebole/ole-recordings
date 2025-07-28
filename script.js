@@ -106,7 +106,6 @@ function renderPlaylist(category = "all") {
 
       const recordedVideos = data.map((item, index) => {
         const dateTime = formatDateRange(item.start_time, item.end_time);
-        console.log(dateTime);
         videoDate = dateTime.date;
         return {
           title: `Part ${index + 1}`,
@@ -155,6 +154,8 @@ function renderPlaylist(category = "all") {
       playlistContainer.innerHTML = "<p>Error loading playlist.</p>";
     });
 }
+
+console.log(videoDate);
 
 function loadVideo(index) {
   currentVideoIndex = index;
