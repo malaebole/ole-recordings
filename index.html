@@ -8,7 +8,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>🎬 OLE Player</h1>
+      <h1>🎬 OLE Player <span id="videoDate"></span></h1>
 
       <!-- Camera Selection -->
       <div class="camera-selector">
@@ -59,7 +59,7 @@
 
       <!-- Video Player -->
       <div class="video-wrapper">
-        <video id="player" controls muted autoplay></video>
+        <video id="player" controls autoplay></video>
       </div>
 
       <!-- Playlist -->
@@ -68,7 +68,6 @@
         <div id="playlist" class="playlist"></div>
       </div>
     </div>
-
     <div id="loader" class="loader hidden">Loading recordings...</div>
 
     <script src="script.js"></script>

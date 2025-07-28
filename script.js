@@ -1,10 +1,8 @@
 const loader = document.getElementById("loader");
 const videoPlayer = document.getElementById("player");
-const videoDetailsContainer = document.getElementById("video-details");
 const playlistContainer = document.getElementById("playlist");
-
+let videoDate = "";
 let currentVideoIndex = 0;
-
 let videoList = [
   {
     title: "Live Camera Feed",
@@ -12,7 +10,7 @@ let videoList = [
     thumbnail: "thumbnail-live.png",
     category: "live",
     live: true,
-    datetime: getFormattedCurrentDateTime(),
+    datetime: currentDateTime(),
   },
 ];
 
@@ -21,7 +19,7 @@ function getQueryParam(param) {
   return urlParams.get(param);
 }
 
-function getFormattedCurrentDateTime() {
+function currentDateTime() {
   const now = new Date();
   const pad = (n) => n.toString().padStart(2, "0");
   let hours = now.getHours();
@@ -39,32 +37,37 @@ function getFormattedCurrentDateTime() {
 function formatDateRange(startStr, endStr) {
   const startDate = parseCustomDate(startStr);
   const endDate = parseCustomDate(endStr);
-  if (!startDate || !endDate) return "Invalid date";
+  if (!startDate || !endDate)
+    return { date: "Invalid date", time: "Invalid time" };
 
-  const formatDate = (date, includeDate = true) => {
+  const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formatTime = (date) => {
     let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    return includeDate
-      ? `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`
-      : `${hours}:${minutes} ${ampm}`;
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
   };
 
-  return `${formatDate(startDate)} - ${formatDate(endDate, false)}`;
+  return {
+    date: formatDate(startDate),
+    time: `${formatTime(startDate)} - ${formatTime(endDate)}`,
+  };
 }
 
 function parseCustomDate(str) {
-  const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)$/;
+  const regex = /^(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)$/;
   const match = str.match(regex);
   if (!match) return null;
 
-  let [_, day, month, year, hour, minute, second, period] = match;
-  hour = parseInt(hour);
+  let [_, year, month, day, hour, minute, second, period] = match;
+  hour = parseInt(hour, 10);
   if (period === "PM" && hour !== 12) hour += 12;
   if (period === "AM" && hour === 12) hour = 0;
 
@@ -97,14 +100,18 @@ function renderPlaylist(category = "all") {
         return;
       }
 
-      const recordedVideos = data.map((item, index) => ({
-        title: `Part ${index + 1}`,
-        url: item.url,
-        category: item?.category || "match",
-        thumbnail: "thumbnail.png",
-        live: false,
-        datetime: formatDateRange(item.start_time, item.end_time),
-      }));
+      const recordedVideos = data.map((item, index) => {
+        const datetime = formatDateRange(item.start_time, item.end_time);
+        videoDate = datetime.date;
+        return {
+          title: `Part ${index + 1}`,
+          url: item.url,
+          category: item?.category || "match",
+          thumbnail: "thumbnail.png",
+          live: false,
+          datetime: datetime.time,
+        };
+      });
 
       // Merge recordings with existing list
       videoList = [videoList[0], ...recordedVideos];
@@ -127,8 +134,7 @@ function renderPlaylist(category = "all") {
           <img src="${video.thumbnail}" alt="${video.title}" />
           <div class="playlist-info">
               <h3>${video.title}</h3>
-              <p>${video.category} @ ${video.datetime}</p>
-              <p>${video.category === "live" ? "Live Feed" : "Match Video"}</p>
+              <p>${video.datetime}</p>
           </div>
           ${video.live ? '<div class="live-tag">LIVE</div>' : ""}
         `;
@@ -147,6 +153,7 @@ function renderPlaylist(category = "all") {
 
 function loadVideo(index) {
   currentVideoIndex = index;
+  videoPlayer.type = "video/mp4";
   videoPlayer.src = videoList[index].url;
   videoPlayer.load();
   videoPlayer.play();
@@ -165,6 +172,24 @@ videoPlayer.addEventListener("ended", () => {
   }
 });
 
+function downloadVideo() {
+  const video = videoList[currentVideoIndex];
+
+  // Skip if it's a live stream or YouTube video
+  if (video.live || video.isYouTube || video.url.startsWith("rtsp://")) {
+    alert("Download not available for live streams");
+    return;
+  }
+
+  // Create invisible download link and trigger click
+  const link = document.createElement("a");
+  link.href = video.url;
+  link.download = video.title ? `${video.title}.mp4` : "recording.mp4";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 // Handle camera/category filter toggle
 document.querySelectorAll(".camera-option input").forEach((radio) => {
   radio.addEventListener("change", function () {
@@ -172,6 +197,11 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
       renderPlaylist(this.value);
     }
   });
+});
+
+//document.getElementById("videoDate")
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("videoDate").textContent = `${videoDate}`;
 });
 
 // Initialize on load
