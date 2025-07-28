@@ -8,16 +8,32 @@ let currentVideoIndex = 0;
 let videoList = [
   {
     title: "Live Camera Feed",
-    url: "rtsp://15.207.205.103:7554/h264",
+    url: "https://www.youtube.com/watch?v=fO9e9jnhYK8", //"rtsp://15.207.205.103:7554/h264",
     thumbnail: "thumbnail-live.png",
     category: "live",
     live: true,
+    datetime: getFormattedCurrentDateTime(),
   },
 ];
 
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(param);
+}
+
+function getFormattedCurrentDateTime() {
+  const now = new Date();
+  const pad = (n) => n.toString().padStart(2, "0");
+  let hours = now.getHours();
+  const minutes = pad(now.getMinutes());
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const formatted = `${pad(now.getDate())}/${pad(
+    now.getMonth() + 1
+  )}/${now.getFullYear()} ${pad(hours)}:${minutes} ${ampm}`;
+
+  return formatted;
 }
 
 function formatDateRange(start, end) {
@@ -66,14 +82,12 @@ function renderPlaylist(category = "all") {
       }
 
       const recordedVideos = data.map((item, index) => ({
-        title: `Part ${index + 1} (${formatDateRange(
-          item.start_time,
-          item.end_time
-        )})`,
+        title: `Part ${index + 1}`,
         url: item.url,
         category: item?.category || "match",
         thumbnail: "thumbnail.png",
         live: false,
+        datetime: formatDateRange(item.start_time, item.end_time),
       }));
 
       // Merge recordings with existing list
@@ -97,7 +111,7 @@ function renderPlaylist(category = "all") {
           <img src="${video.thumbnail}" alt="${video.title}" />
           <div class="playlist-info">
               <h3>${video.title}</h3>
-              <p>${video.category}</p>
+              <p>${video.datetime} @ ${video.datetime}</p>
               <p>${video.category === "live" ? "Live Feed" : "Match Video"}</p>
           </div>
           ${video.live ? '<div class="live-tag">LIVE</div>' : ""}
