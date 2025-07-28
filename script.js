@@ -3,16 +3,7 @@ const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
 let videoDate = "";
 let currentVideoIndex = 0;
-let videoList = [
-  {
-    title: "Live Camera Feed",
-    url: "https://www.youtube.com/watch?v=fO9e9jnhYK8", //"rtsp://15.207.205.103:7554/h264",
-    thumbnail: "thumbnail-live.png",
-    category: "live",
-    live: true,
-    datetime: currentDateTime(),
-  },
-];
+let videoList = [];
 
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -107,6 +98,8 @@ function renderPlaylist(category = "all") {
       const recordedVideos = data.map((item, index) => {
         const dateTime = formatDateRange(item.start_time, item.end_time);
         videoDate = dateTime.date;
+
+        console.log(videoDate);
         return {
           title: `Part ${index + 1}`,
           url: item.url,
@@ -154,8 +147,6 @@ function renderPlaylist(category = "all") {
       playlistContainer.innerHTML = "<p>Error loading playlist.</p>";
     });
 }
-
-console.log(videoDate);
 
 function loadVideo(index) {
   currentVideoIndex = index;
