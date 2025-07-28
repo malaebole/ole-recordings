@@ -37,13 +37,9 @@ function getFormattedCurrentDateTime() {
 }
 
 function formatDateRange(startStr, endStr) {
-  const parseDate = (str) => {
-    const [datePart, timePart, ampm] = str.split(/\s+/);
-    const [day, month, year] = datePart.split("-");
-    return new Date(`${year}-${month}-${day}T${timePart} ${ampm}`);
-  };
-  const startDate = parseDate(startStr);
-  const endDate = parseDate(endStr);
+  const startDate = parseCustomDate(startStr);
+  const endDate = parseCustomDate(endStr);
+  if (!startDate || !endDate) return "Invalid date";
 
   const formatDate = (date, includeDate = true) => {
     const day = String(date.getDate()).padStart(2, "0");
@@ -60,6 +56,24 @@ function formatDateRange(startStr, endStr) {
   };
 
   return `${formatDate(startDate)} - ${formatDate(endDate, false)}`;
+}
+
+function parseCustomDate(str) {
+  const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)$/;
+  const match = str.match(regex);
+  if (!match) return null;
+
+  let [_, day, month, year, hour, minute, second, period] = match;
+  hour = parseInt(hour);
+  if (period === "PM" && hour !== 12) hour += 12;
+  if (period === "AM" && hour === 12) hour = 0;
+
+  return new Date(
+    `${year}-${month}-${day}T${String(hour).padStart(
+      2,
+      "0"
+    )}:${minute}:${second}`
+  );
 }
 
 function renderPlaylist(category = "all") {
