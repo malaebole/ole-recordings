@@ -67,19 +67,16 @@ function formatDateRange(startStr, endStr) {
 
 function parseCustomDate(str) {
   str = str.trim();
-  const regex = /^(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2}):(\d{2}) ?(AM|PM)$/i;
+  const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) ?(AM|PM)$/i;
   const match = str.match(regex);
   if (!match) return null;
-
-  let [_, year, month, day, hour, minute, second, period] = match;
-
+  let [_, day, month, year, hour, minute, second, period] = match;
   year = parseInt(year, 10);
   month = parseInt(month, 10) - 1;
   day = parseInt(day, 10);
   hour = parseInt(hour, 10);
   minute = parseInt(minute, 10);
   second = parseInt(second, 10);
-
   if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
   if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
 
