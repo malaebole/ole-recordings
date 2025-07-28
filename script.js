@@ -67,16 +67,18 @@ function parseCustomDate(str) {
   if (!match) return null;
 
   let [_, year, month, day, hour, minute, second, period] = match;
+
+  year = parseInt(year, 10);
+  month = parseInt(month, 10) - 1; // Month is 0-based in JS Date
+  day = parseInt(day, 10);
   hour = parseInt(hour, 10);
+  minute = parseInt(minute, 10);
+  second = parseInt(second, 10);
+
   if (period === "PM" && hour !== 12) hour += 12;
   if (period === "AM" && hour === 12) hour = 0;
 
-  return new Date(
-    `${year}-${month}-${day}T${String(hour).padStart(
-      2,
-      "0"
-    )}:${minute}:${second}`
-  );
+  return new Date(year, month, day, hour, minute, second);
 }
 
 function renderPlaylist(category = "all") {
