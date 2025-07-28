@@ -128,8 +128,7 @@ function renderPlaylist(category = "all") {
         item.innerHTML = `
           <img src="${video.thumbnail}" alt="${video.title}" />
           <div class="playlist-info">
-              <h3>${video.title}</h3>
-              <p>${video.datetime}</p>
+              <h3>${video.datetime}</h3>
           </div>`;
 
         playlistContainer.appendChild(item);
