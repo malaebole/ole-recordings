@@ -101,15 +101,16 @@ function renderPlaylist(category = "all") {
       }
 
       const recordedVideos = data.map((item, index) => {
-        const datetime = formatDateRange(item.start_time, item.end_time);
-        videoDate = datetime.date;
+        const dateTime = formatDateRange(item.start_time, item.end_time);
+        console.log(dateTime);
+        videoDate = dateTime.date;
         return {
           title: `Part ${index + 1}`,
           url: item.url,
           category: item?.category || "match",
           thumbnail: "thumbnail.png",
           live: false,
-          datetime: datetime.time,
+          datetime: dateTime.time,
         };
       });
 
