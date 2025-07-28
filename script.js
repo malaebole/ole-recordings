@@ -37,8 +37,13 @@ function getFormattedCurrentDateTime() {
 }
 
 function formatDateRange(startStr, endStr) {
-  const startDate = new Date(startStr);
-  const endDate = new Date(endStr);
+  const parseDate = (str) => {
+    const [datePart, timePart, ampm] = str.split(/\s+/);
+    const [day, month, year] = datePart.split("-");
+    return new Date(`${year}-${month}-${day}T${timePart} ${ampm}`);
+  };
+  const startDate = parseDate(startStr);
+  const endDate = parseDate(endStr);
 
   const formatDate = (date, includeDate = true) => {
     const day = String(date.getDate()).padStart(2, "0");
