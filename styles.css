@@ -18,6 +18,10 @@ h1 {
   margin-bottom: 10px;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Camera Selection Styles */
 .camera-selector {
   background-color: #1e1e1e;

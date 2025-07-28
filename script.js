@@ -96,6 +96,7 @@ function renderPlaylist(category = "all") {
 
       videoList = data.map((item, index) => {
         const dateTime = formatDateRange(item.start_time, item.end_time);
+        document.getElementById("videoDate").textContent = dateTime.date;
         return {
           title: `Part ${index + 1}`,
           url: item.url,
@@ -192,13 +193,6 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
       renderPlaylist(this.value);
     }
   });
-});
-
-//document.getElementById("videoDate")
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("Video Date: ", videoList[currentVideoIndex].date);
-  document.getElementById("videoDate").textContent =
-    videoList[currentVideoIndex].date;
 });
 
 // Initialize on load
