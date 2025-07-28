@@ -95,11 +95,11 @@ function renderPlaylist(category = "all") {
         return;
       }
 
-      const recordedVideos = data.map((item, index) => {
+      videoList = data.map((item, index) => {
+        console.log(item);
         const dateTime = formatDateRange(item.start_time, item.end_time);
         videoDate = dateTime.date;
 
-        console.log(videoDate);
         return {
           title: `Part ${index + 1}`,
           url: item.url,
@@ -110,9 +110,7 @@ function renderPlaylist(category = "all") {
         };
       });
 
-      // Merge recordings with existing list
-      videoList = [videoList[0], ...recordedVideos];
-
+      // filter videos according to selection console.log(videoDate);
       const filteredVideos =
         category === "all"
           ? videoList
@@ -132,9 +130,7 @@ function renderPlaylist(category = "all") {
           <div class="playlist-info">
               <h3>${video.title}</h3>
               <p>${video.datetime}</p>
-          </div>
-          ${video.live ? '<div class="live-tag">LIVE</div>' : ""}
-        `;
+          </div>`;
 
         playlistContainer.appendChild(item);
       });
@@ -200,6 +196,7 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
 
 //document.getElementById("videoDate")
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("Video Date: ", videoDate);
   document.getElementById("videoDate").textContent = `${videoDate}`;
 });
 
