@@ -164,22 +164,95 @@ videoPlayer.addEventListener("ended", () => {
   }
 });
 
-function downloadVideo() {
-  const video = videoList[currentVideoIndex];
+// Mute/Unmute Toggle
+function toggleMute() {
+  try {
+    videoPlayer.muted = !videoPlayer.muted;
+    muteIcon.textContent = videoPlayer.muted ? "🔇" : "🔊";
 
-  // Skip if it's a live stream or YouTube video
-  if (video.live || video.isYouTube || video.url.startsWith("rtsp://")) {
-    alert("Download not available for live streams");
+    // Visual feedback
+    const feedback = document.createElement("div");
+    feedback.textContent = videoPlayer.muted ? "Muted" : "Unmuted";
+    feedback.className = `control-feedback ${videoPlayer.muted ? "muted" : ""}`;
+    document.body.appendChild(feedback);
+
+    setTimeout(() => feedback.remove(), 1000);
+  } catch (error) {
+    console.error("Mute toggle failed:", error);
+  }
+}
+
+// Picture-in-Picture Mode
+async function enterPiP() {
+  try {
+    if (document.pictureInPictureElement) {
+      await document.exitPictureInPicture();
+    } else if (document.pictureInPictureEnabled) {
+      await videoPlayer.requestPictureInPicture();
+    } else {
+      showAlert("PiP not supported in your browser");
+    }
+  } catch (error) {
+    console.error("PiP failed:", error);
+    showAlert("PiP unavailable: " + error.message);
+  }
+}
+
+// Download Current Video
+function downloadVideo() {
+  const currentVideo = videoList[currentVideoIndex];
+
+  // Block unsupported downloads
+  if (currentVideo.live || currentVideo.url.startsWith("rtsp://")) {
+    showAlert("Live streams cannot be downloaded");
     return;
   }
 
-  // Create invisible download link and trigger click
-  const link = document.createElement("a");
-  link.href = video.url;
-  link.download = video.title ? `${video.title}.mp4` : "recording.mp4";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  try {
+    const link = document.createElement("a");
+    link.href = currentVideo.url;
+    link.download = currentVideo.title
+      ? `${sanitizeFilename(currentVideo.title)}.mp4`
+      : "recording.mp4";
+    link.style.display = "none";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showAlert("Download started");
+  } catch (error) {
+    console.error("Download failed:", error);
+    showAlert("Download failed");
+  }
+}
+
+// 4. Fullscreen Toggle
+function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      videoPlayer.requestFullscreen().catch((err) => {
+        showAlert("Fullscreen failed: " + err.message);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  } catch (error) {
+    console.error("Fullscreen error:", error);
+  }
+}
+
+// Helper Functions
+function showAlert(message) {
+  const alert = document.createElement("div");
+  alert.className = "video-alert";
+  alert.textContent = message;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 3000);
+}
+
+function sanitizeFilename(name) {
+  return name.replace(/[^a-z0-9]/gi, "_").substring(0, 50);
 }
 
 // Handle camera/category filter toggle

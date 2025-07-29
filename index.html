@@ -78,6 +78,29 @@
         <video id="player" controls autoplay></video>
       </div>
 
+      <!-- Video Player Controls -->
+      <div class="video-controls">
+        <button onclick="toggleMute()" id="muteBtn" class="control-btn">
+          <span class="icon" id="muteIcon">🔊</span>
+          <span class="btn-text">Toggle Sound</span>
+        </button>
+
+        <button onclick="enterPiP()" class="control-btn">
+          <span class="icon">📺</span>
+          <span class="btn-text">Picture-in-Picture</span>
+        </button>
+
+        <button onclick="downloadVideo()" class="control-btn">
+          <span class="icon">⬇️</span>
+          <span class="btn-text">Download</span>
+        </button>
+
+        <button onclick="toggleFullscreen()" class="control-btn">
+          <span class="icon">⛶</span>
+          <span class="btn-text">Fullscreen</span>
+        </button>
+      </div>
+
       <!-- Playlist -->
       <div class="playlist-container">
         <h2>Video Playlist</h2>
