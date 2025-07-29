@@ -268,5 +268,21 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const video = document.getElementById("player");
+  video.muted = true;
+  video.playsInline = true;
+
+  // Attempt autoplay
+  const playPromise = video.play();
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
+      // Show play button if autoplay fails
+      video.controls = true;
+      console.log("Autoplay prevented:", error);
+    });
+  }
+});
+
 // Initialize on load
 renderPlaylist();
