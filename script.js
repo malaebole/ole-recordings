@@ -259,7 +259,7 @@ function sanitizeFilename(name) {
 document.querySelectorAll(".camera-option input").forEach((radio) => {
   radio.addEventListener("change", function () {
     if (this.value === "cam2" || this.value === "live") {
-      alert("Coming soon... We are working on it.");
+      showAlert("We are working on it. Coming soon...");
       return;
     }
     if (this.checked) {
