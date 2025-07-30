@@ -163,8 +163,8 @@ function loadVideoByFilter(index, category) {
 
   if (!filtered[index]) return;
 
-  currentVideoIndex = index;
-  videoPlayer.src = filtered[index].url;
+  //currentVideoIndex = index;
+  videoPlayer.src = filtered[currentVideoIndex].url;
   videoPlayer.muted = true;
   videoPlayer.load();
   videoPlayer.play().catch((err) => {
