@@ -133,16 +133,19 @@ function applyFilter(category) {
       : videoList.filter((v) => v.category === category);
 
   playlistContainer.innerHTML = "";
-
   if (filtered.length === 0) {
     playlistContainer.innerHTML = "<p>No videos for selected camera.</p>";
     return;
   }
 
+  const originalVideo = videoList[currentVideoIndex];
+  const matchIndex = filtered.findIndex((v) => v.url === originalVideo?.url);
+  const startIndex = matchIndex !== -1 ? matchIndex : 0;
+
   filtered.forEach((video, i) => {
     const item = document.createElement("div");
-    item.className = `playlist-item ${i === 0 ? "active" : ""}`;
-    item.onclick = () => loadVideoByFilter(currentVideoIndex, category);
+    item.className = `playlist-item ${i === startIndex ? "active" : ""}`;
+    item.onclick = () => loadVideoByFilter(i, category);
 
     item.innerHTML = `
       <img src="${video.thumbnail}" alt="${video.title}" />
@@ -152,7 +155,7 @@ function applyFilter(category) {
     playlistContainer.appendChild(item);
   });
 
-  loadVideoByFilter(0, category);
+  loadVideoByFilter(startIndex, category);
 }
 
 function loadVideoByFilter(index, category) {
@@ -162,8 +165,9 @@ function loadVideoByFilter(index, category) {
       : videoList.filter((v) => v.category === category);
 
   if (!filtered[index]) return;
+
   currentVideoIndex = index;
-  videoPlayer.src = filtered[currentVideoIndex].url;
+  videoPlayer.src = filtered[index].url;
   videoPlayer.muted = true;
   videoPlayer.load();
   videoPlayer.play().catch((err) => {
@@ -173,6 +177,8 @@ function loadVideoByFilter(index, category) {
   document.querySelectorAll(".playlist-item").forEach((el, i) => {
     el.classList.toggle("active", i === index);
   });
+
+  videoPlayer.scrollIntoView({ behavior: "smooth" });
 }
 
 videoPlayer.addEventListener("ended", () => {
@@ -275,7 +281,6 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
     if (this.checked) {
       renderPlaylist(this.value);
     }
-    loadVideoByFilter(currentVideoIndex, this.value);
   });
 });
 
