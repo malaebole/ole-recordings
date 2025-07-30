@@ -2,8 +2,8 @@ const loader = document.getElementById("loader");
 const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
 let currentVideoIndex = 0;
+let lastSelectedIndex = 0;
 let videoList = [];
-let lastPlayedIndexByCategory = {};
 
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -137,9 +137,7 @@ function applyFilter(category) {
   }
 
   const startIndex =
-    lastPlayedIndexByCategory[category] !== undefined
-      ? lastPlayedIndexByCategory[category]
-      : 0;
+    lastSelectedIndex < filtered.length ? lastSelectedIndex : 0;
 
   filtered.forEach((video, i) => {
     const item = document.createElement("div");
@@ -158,24 +156,27 @@ function applyFilter(category) {
 }
 
 function loadVideoByFilter(index, category) {
+  lastSelectedIndex = index;
   currentVideoIndex = index;
-  lastPlayedIndexByCategory[category] = index;
 
   const filtered = videoList.filter((v) => v.category === category);
-  videoPlayer.src = filtered[index].url;
+  if (!filtered[index]) index = 0;
+  const video = filtered[index];
+
+  videoPlayer.src = video.url;
   videoPlayer.muted = true;
   videoPlayer.load();
   videoPlayer.play().catch((err) => {
     console.warn("Autoplay prevented:", err);
   });
 
-  // Highlight current playlist item
+  // Highlight active item
   const items = document.querySelectorAll(".playlist-item");
   items.forEach((item, i) => {
     item.classList.toggle("active", i === index);
   });
 
-  // Scroll to player
+  // Scroll up to video player
   videoPlayer.scrollIntoView({ behavior: "smooth" });
 }
 
