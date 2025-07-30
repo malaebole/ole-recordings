@@ -3,6 +3,7 @@ const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
 let currentVideoIndex = 0;
 let videoList = [];
+let lastPlayedIndexByCategory = {};
 
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -127,20 +128,18 @@ async function renderPlaylist(category = "camera-1") {
 }
 
 function applyFilter(category) {
-  const filtered =
-    category === "all"
-      ? videoList
-      : videoList.filter((v) => v.category === category);
-
+  const filtered = videoList.filter((v) => v.category === category);
   playlistContainer.innerHTML = "";
+
   if (filtered.length === 0) {
     playlistContainer.innerHTML = "<p>No videos for selected camera.</p>";
     return;
   }
 
-  const originalVideo = videoList[currentVideoIndex];
-  const matchIndex = filtered.findIndex((v) => v.url === originalVideo?.url);
-  const startIndex = matchIndex !== -1 ? matchIndex : 0;
+  const startIndex =
+    lastPlayedIndexByCategory[category] !== undefined
+      ? lastPlayedIndexByCategory[category]
+      : 0;
 
   filtered.forEach((video, i) => {
     const item = document.createElement("div");
@@ -159,14 +158,10 @@ function applyFilter(category) {
 }
 
 function loadVideoByFilter(index, category) {
-  const filtered =
-    category === "all"
-      ? videoList
-      : videoList.filter((v) => v.category === category);
-
-  if (!filtered[index]) return;
-
   currentVideoIndex = index;
+  lastPlayedIndexByCategory[category] = index;
+
+  const filtered = videoList.filter((v) => v.category === category);
   videoPlayer.src = filtered[index].url;
   videoPlayer.muted = true;
   videoPlayer.load();
@@ -174,10 +169,13 @@ function loadVideoByFilter(index, category) {
     console.warn("Autoplay prevented:", err);
   });
 
-  document.querySelectorAll(".playlist-item").forEach((el, i) => {
-    el.classList.toggle("active", i === index);
+  // Highlight current playlist item
+  const items = document.querySelectorAll(".playlist-item");
+  items.forEach((item, i) => {
+    item.classList.toggle("active", i === index);
   });
 
+  // Scroll to player
   videoPlayer.scrollIntoView({ behavior: "smooth" });
 }
 
