@@ -142,7 +142,7 @@ function applyFilter(category) {
   filtered.forEach((video, i) => {
     const item = document.createElement("div");
     item.className = `playlist-item ${i === 0 ? "active" : ""}`;
-    item.onclick = () => loadVideoByFilter(i, category);
+    item.onclick = () => loadVideoByFilter(currentVideoIndex, category);
 
     item.innerHTML = `
       <img src="${video.thumbnail}" alt="${video.title}" />
@@ -162,8 +162,7 @@ function loadVideoByFilter(index, category) {
       : videoList.filter((v) => v.category === category);
 
   if (!filtered[index]) return;
-
-  //currentVideoIndex = index;
+  currentVideoIndex = index;
   videoPlayer.src = filtered[currentVideoIndex].url;
   videoPlayer.muted = true;
   videoPlayer.load();
@@ -276,6 +275,7 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
     if (this.checked) {
       renderPlaylist(this.value);
     }
+    loadVideoByFilter(currentVideoIndex, this.value);
   });
 });
 
