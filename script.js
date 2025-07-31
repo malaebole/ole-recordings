@@ -65,15 +65,24 @@ function parseCustomDate(str) {
 async function renderPlaylist(category = "camera-1") {
   playlistContainer.innerHTML = "";
   const bookingId = getQueryParam("booking");
-  if (!bookingId) {
-    playlistContainer.innerHTML = "<p>No booking ID provided in URL.</p>";
+  const startTime = getQueryParam("start_time");
+  const endTime = getQueryParam("end_time");
+  if (!bookingId && (!startTime || !endTime)) {
+    playlistContainer.innerHTML =
+      "<p>No booking ID or time range provided.</p>";
     return;
   }
-
   loader.classList.remove("hidden");
 
-  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings?booking_id=${bookingId}`;
-  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings?booking_id=${bookingId}`;
+  const queryParameters =
+    startTime && endTime
+      ? `start_time=${encodeURIComponent(
+          startTime
+        )}&end_time=${encodeURIComponent(endTime)}`
+      : `booking=${bookingId}`;
+
+  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings?${queryParameters}`;
+  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings?${queryParameters}`;
 
   try {
     const [cam1Res, cam2Res] = await Promise.all([
@@ -294,6 +303,40 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Autoplay prevented:", error);
     });
   }
+
+  document
+    .getElementById("timeFilterForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
+
+      if (!start || !end) {
+        alert("Please select both start and end time.");
+        return;
+      }
+
+      const formatToSQL = (dateStr) => {
+        const date = new Date(dateStr);
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+          date.getDate()
+        )} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+      };
+
+      const formattedStart = formatToSQL(start);
+      const formattedEnd = formatToSQL(end);
+
+      const url = new URL(window.location.href);
+      url.searchParams.set("start_time", formattedStart);
+      url.searchParams.set("end_time", formattedEnd);
+
+      // remove booking_id if present
+      url.searchParams.delete("booking");
+
+      // reload page with new query
+      window.location.href = url.toString();
+    });
 
   // Default camera-1 videos
   renderPlaylist("camera-1");
