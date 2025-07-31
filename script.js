@@ -64,9 +64,14 @@ function parseCustomDate(str) {
 
 async function renderPlaylist(category = "camera-1") {
   playlistContainer.innerHTML = "";
-  const bookingId = getQueryParam("booking");
-  const startTime = getQueryParam("start_time");
-  const endTime = getQueryParam("end_time");
+  const bookingId = getQueryParam("booking") || null;
+  const startTime = getQueryParam("start_time") || null;
+  const endTime = getQueryParam("end_time") || null;
+
+  console.log("Booking: ", bookingId);
+  console.log("Start: ", startTime);
+  console.log("End: ", endTime);
+
   if (!bookingId && (!startTime || !endTime)) {
     playlistContainer.innerHTML =
       "<p>No booking ID or time range provided.</p>";
