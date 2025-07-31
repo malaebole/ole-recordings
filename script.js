@@ -64,7 +64,7 @@ function parseCustomDate(str) {
 
 async function renderPlaylist(category = "camera-1") {
   playlistContainer.innerHTML = "";
-  const bookingId = getQueryParam("booking") || null;
+  const bookingId = getQueryParam("booking_id") || null;
   const startTime = getQueryParam("start_time") || null;
   const endTime = getQueryParam("end_time") || null;
 
