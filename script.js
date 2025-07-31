@@ -373,6 +373,23 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = url.toString();
     });
 
+  document.getElementById("clearSearchTimes")?.addEventListener("click", () => {
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
+
+    // Remove from localStorage
+    localStorage.removeItem("filter_start_time");
+    localStorage.removeItem("filter_end_time");
+
+    // Reload page with booking_id fallback
+    const bookingId = getQueryParam("booking");
+    if (bookingId) {
+      window.location.href = `${window.location.pathname}?booking=${bookingId}`;
+    } else {
+      window.location.href = window.location.pathname;
+    }
+  });
+
   // Default camera-1 videos
   renderPlaylist("camera-1");
 });
