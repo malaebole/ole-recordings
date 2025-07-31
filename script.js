@@ -309,6 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function isValid30MinStep(dateStr) {
+    const date = new Date(dateStr);
+    const minutes = date.getMinutes();
+    return minutes === 0 || minutes === 30;
+  }
+
   document
     .getElementById("timeFilterForm")
     .addEventListener("submit", function (e) {
@@ -319,6 +325,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!start || !end) {
         alert("Please select both start and end time.");
         return;
+      }
+
+      if (!isValid30MinStep(start) || !isValid30MinStep(end)) {
+        e.preventDefault();
+        alert("Please select times ending in :00 or :30 only.");
       }
 
       const formatToSQL = (dateStr) => {
