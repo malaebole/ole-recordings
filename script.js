@@ -309,6 +309,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  //datetime filters
+  const startInput = document.getElementById("startTime");
+  const endInput = document.getElementById("endTime");
+
+  const savedStart = localStorage.getItem("filter_start_time");
+  const savedEnd = localStorage.getItem("filter_end_time");
+
+  if (savedStart) startInput.value = savedStart;
+  if (savedEnd) endInput.value = savedEnd;
+
   function isValid30MinStep(dateStr) {
     const date = new Date(dateStr);
     const minutes = date.getMinutes();
@@ -336,6 +346,10 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         showAlert("End time must be after start time.");
       }
+
+      //Save selected datetime to localStorage
+      localStorage.setItem("filter_start_time", start);
+      localStorage.setItem("filter_end_time", end);
 
       const formatToSQL = (dateStr) => {
         const date = new Date(dateStr);
