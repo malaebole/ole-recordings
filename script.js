@@ -67,16 +67,6 @@ async function renderPlaylist(category = "camera-1") {
   const bookingId = getQueryParam("booking_id") || null;
   const startTime = getQueryParam("start_time") || null;
   const endTime = getQueryParam("end_time") || null;
-
-  console.log("Booking: ", bookingId);
-  console.log("Start: ", startTime);
-  console.log("End: ", endTime);
-
-  if (!bookingId && (!startTime || !endTime)) {
-    playlistContainer.innerHTML =
-      "<p>No booking ID or time range provided.</p>";
-    return;
-  }
   loader.classList.remove("hidden");
 
   const queryParameters =
@@ -84,7 +74,9 @@ async function renderPlaylist(category = "camera-1") {
       ? `start_time=${encodeURIComponent(
           startTime
         )}&end_time=${encodeURIComponent(endTime)}`
-      : `booking=${bookingId}`;
+        ? bookingId
+        : `booking=${bookingId}`
+      : "";
 
   const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings?${queryParameters}`;
   const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings?${queryParameters}`;
@@ -382,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("filter_end_time");
 
     // Reload page with booking_id fallback
-    const bookingId = getQueryParam("booking");
+    const bookingId = getQueryParam("booking_id");
     if (bookingId) {
       window.location.href = `${window.location.pathname}?booking=${bookingId}`;
     } else {
