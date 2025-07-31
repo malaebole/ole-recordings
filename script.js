@@ -69,17 +69,19 @@ async function renderPlaylist(category = "camera-1") {
   const endTime = getQueryParam("end_time") || null;
   loader.classList.remove("hidden");
 
-  const queryParameters =
-    startTime && endTime
-      ? `start_time=${encodeURIComponent(
-          startTime
-        )}&end_time=${encodeURIComponent(endTime)}`
-        ? bookingId
-        : `booking=${bookingId}`
-      : "";
+  let query = "";
+  if (startTime && endTime) {
+    query = `?start_time=${encodeURIComponent(
+      startTime
+    )}&end_time=${encodeURIComponent(endTime)}`;
+  } else {
+    if (bookingId) {
+      query = `?booking_id=${bookingId}`;
+    }
+  }
 
-  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings?${queryParameters}`;
-  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings?${queryParameters}`;
+  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings${query}`;
+  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings${query}`;
 
   try {
     const [cam1Res, cam2Res] = await Promise.all([
