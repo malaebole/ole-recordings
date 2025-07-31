@@ -358,3 +358,48 @@ video::-webkit-media-controls {
     font-size: 1rem;
   }
 }
+.time-filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  background-color: #1e1e1e;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.time-filter-form label {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.time-filter-form input[type="datetime-local"] {
+  background-color: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.time-filter-form input[type="datetime-local"]:focus {
+  border-color: #4caf50;
+}
+
+.time-filter-form button {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.time-filter-form button:hover {
+  background-color: #43a047;
+}

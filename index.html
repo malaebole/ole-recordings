@@ -73,24 +73,30 @@
         </div>
       </div>
 
-      <form
-        id="timeFilterForm"
-        class="time-filter-form"
-        style="margin-bottom: 1rem"
-      >
-        <label for="startTime">Start Time:</label>
-        <input
-          type="datetime-local"
-          id="startTime"
-          name="start_time"
-          required
-        />
+      <!-- Video Filters by datetime -->
+      <div class="datetime-container">
+        <form class="time-filter-form">
+          <label for="start_time">Start Time:</label>
+          <input
+            type="datetime-local"
+            id="start_time"
+            name="start_time"
+            step="1800"
+            required
+          />
 
-        <label for="endTime">End Time:</label>
-        <input type="datetime-local" id="endTime" name="end_time" required />
+          <label for="end_time">End Time:</label>
+          <input
+            type="datetime-local"
+            id="end_time"
+            name="end_time"
+            step="1800"
+            required
+          />
 
-        <button type="submit">Search</button>
-      </form>
+          <button type="submit">Filter</button>
+        </form>
+      </div>
 
       <!-- Video Player -->
       <div class="video-wrapper">
