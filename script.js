@@ -323,13 +323,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const end = document.getElementById("endTime").value;
 
       if (!start || !end) {
-        alert("Please select both start and end time.");
+        showAlert("Please select both start and end time.");
         return;
       }
 
       if (!isValid30MinStep(start) || !isValid30MinStep(end)) {
         e.preventDefault();
-        alert("Please select times ending in :00 or :30 only.");
+        showAlert("Time must be in 30-minute steps (:00 or :30 only).");
+      }
+
+      if (new Date(start) >= new Date(end)) {
+        e.preventDefault();
+        showAlert("End time must be after start time.");
       }
 
       const formatToSQL = (dateStr) => {
