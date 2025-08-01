@@ -20,11 +20,21 @@
       sizes="16x16"
       href="https://ole-sports.com/front_assets/v2/images/favicon/favicon-16x16.png"
     />
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
       <h1>🎬 OLE Player <span id="videoDate"></span></h1>
+      <input
+        type="text"
+        class="datetime-picker"
+        placeholder="Select Date/Time"
+      />
 
       <!-- Camera Selection -->
       <div class="camera-selector">
@@ -149,6 +159,16 @@
     </div>
     <div id="loader" class="loader hidden">Loading recordings...</div>
 
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="script.js"></script>
+    <script>
+      flatpickr(".datetime-picker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        time_24hr: true,
+      });
+    </script>
   </body>
 </html>

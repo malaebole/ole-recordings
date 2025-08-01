@@ -367,6 +367,7 @@ video::-webkit-media-controls {
   padding: 1rem;
   border-radius: 8px;
   color: #fff;
+  margin-bottom: 10px;
 }
 
 .time-filter-form label {
