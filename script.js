@@ -127,9 +127,9 @@ async function renderPlaylist(category = "camera-1") {
     const cam3Videos = (cam3Data.data || []).map((item, index) => {
       const dt = formatDateRange(item.start_time, item.end_time);
       return {
-        title: `Cam2 - Part ${index + 1}`,
+        title: `Cam3 - Part ${index + 1}`,
         url: item.url,
-        category: "camera-2",
+        category: "camera-3",
         thumbnail: "thumbnail.png",
         date: dt.date,
         time: dt.time,
@@ -140,9 +140,9 @@ async function renderPlaylist(category = "camera-1") {
     const cam4Videos = (cam4Data.data || []).map((item, index) => {
       const dt = formatDateRange(item.start_time, item.end_time);
       return {
-        title: `Cam2 - Part ${index + 1}`,
+        title: `Cam4 - Part ${index + 1}`,
         url: item.url,
-        category: "camera-2",
+        category: "camera-4",
         thumbnail: "thumbnail.png",
         date: dt.date,
         time: dt.time,
