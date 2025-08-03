@@ -80,16 +80,22 @@ async function renderPlaylist(category = "camera-1") {
     }
   }
 
-  const cameraOneURL = `https://recorder.ole-app.ae/api/${category}/recordings${query}`;
-  const cameraTwoURL = `https://recorder.ole-app.ae/api/${category}/recordings${query}`;
+  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings${query}`;
+  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings${query}`;
+  const cameraThreeURL = `https://recorder.ole-app.ae/api/camera-3/recordings${query}`;
+  const cameraFourURL = `https://recorder.ole-app.ae/api/camera-4/recordings${query}`;
 
   try {
-    const [cam1Res, cam2Res] = await Promise.all([
+    const [cam1Res, cam2Res, cam3Res, cam4Res] = await Promise.all([
       fetch(cameraOneURL),
       fetch(cameraTwoURL),
+      fetch(cameraThreeURL),
+      fetch(cameraFourURL),
     ]);
     const cam1Data = await cam1Res.json();
     const cam2Data = await cam2Res.json();
+    const cam3Data = await cam3Res.json();
+    const cam4Data = await cam4Res.json();
 
     const cam1Videos = (cam1Data.data || []).map((item, index) => {
       const dt = formatDateRange(item.start_time, item.end_time);
@@ -118,7 +124,33 @@ async function renderPlaylist(category = "camera-1") {
       };
     });
 
-    videoList = [...cam1Videos, ...cam2Videos];
+    const cam3Videos = (cam3Data.data || []).map((item, index) => {
+      const dt = formatDateRange(item.start_time, item.end_time);
+      return {
+        title: `Cam2 - Part ${index + 1}`,
+        url: item.url,
+        category: "camera-2",
+        thumbnail: "thumbnail.png",
+        date: dt.date,
+        time: dt.time,
+        live: false,
+      };
+    });
+
+    const cam4Videos = (cam4Data.data || []).map((item, index) => {
+      const dt = formatDateRange(item.start_time, item.end_time);
+      return {
+        title: `Cam2 - Part ${index + 1}`,
+        url: item.url,
+        category: "camera-2",
+        thumbnail: "thumbnail.png",
+        date: dt.date,
+        time: dt.time,
+        live: false,
+      };
+    });
+
+    videoList = [...cam1Videos, ...cam2Videos, ...cam3Videos, ...cam4Videos];
     loader.classList.add("hidden");
 
     if (videoList.length === 0) {
