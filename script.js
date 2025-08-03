@@ -65,8 +65,8 @@ function parseCustomDate(str) {
 async function renderPlaylist(category = "camera-1") {
   playlistContainer.innerHTML = "";
   const bookingId = getQueryParam("booking_id") || null;
-  const startTime = getQueryParam("start_time") || null;
-  const endTime = getQueryParam("end_time") || null;
+  const startTime = getQueryParam("s") || null;
+  const endTime = getQueryParam("e") || null;
   loader.classList.remove("hidden");
 
   let query = "";
@@ -80,8 +80,8 @@ async function renderPlaylist(category = "camera-1") {
     }
   }
 
-  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings${query}`;
-  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings${query}`;
+  const cameraOneURL = `https://recorder.ole-app.ae/api/${category}/recordings${query}`;
+  const cameraTwoURL = `https://recorder.ole-app.ae/api/${category}/recordings${query}`;
 
   try {
     const [cam1Res, cam2Res] = await Promise.all([
@@ -303,15 +303,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  //datetime filters
+  // DateTime Filter inputs
   const startInput = document.getElementById("startTime");
   const endInput = document.getElementById("endTime");
 
-  const savedStart = localStorage.getItem("filter_start_time");
-  const savedEnd = localStorage.getItem("filter_end_time");
+  // first see query params and save time into localstorage
+  const startTime = getQueryParam("s") || null;
+  const endTime = getQueryParam("e") || null;
+  if (startTime && endTime) {
+    localStorage.setItem("filter_start_time", startTime);
+    localStorage.setItem("filter_end_time", endTime);
+    startInput.value = startTime;
+    endInput.value = endTime;
+  } else {
+    const savedStart = localStorage.getItem("filter_start_time");
+    const savedEnd = localStorage.getItem("filter_end_time");
 
-  if (savedStart) startInput.value = savedStart;
-  if (savedEnd) endInput.value = savedEnd;
+    if (savedStart) startInput.value = savedStart;
+    if (savedEnd) endInput.value = savedEnd;
+  }
 
   function isValid30MinStep(dateStr) {
     const date = new Date(dateStr);
