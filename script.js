@@ -399,11 +399,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const formattedEnd = formatToSQL(end);
 
       const url = new URL(window.location.href);
-      url.searchParams.set("start_time", formattedStart);
-      url.searchParams.set("end_time", formattedEnd);
+      url.searchParams.set("s", formattedStart);
+      url.searchParams.set("e", formattedEnd);
 
       // remove booking_id if present
-      url.searchParams.delete("booking");
+      url.searchParams.delete("booking_id");
 
       // reload page with new query
       window.location.href = url.toString();
@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reload page with booking_id fallback
     const bookingId = getQueryParam("booking_id");
     if (bookingId) {
-      window.location.href = `${window.location.pathname}?booking=${bookingId}`;
+      window.location.href = `${window.location.pathname}?booking_id=${bookingId}`;
     } else {
       window.location.href = window.location.pathname;
     }
