@@ -326,6 +326,18 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
   });
 });
 
+function setActiveCameraFromQuery() {
+  const category = getQueryParam("c") || null;
+  const targetCamera = category ? `camera-${category}` : "camera-1";
+  const cameraOption = document.querySelector(
+    `.camera-option input[value="${targetCamera}"]`
+  );
+  if (cameraOption) {
+    cameraOption.checked = true;
+    cameraOption.dispatchEvent(new Event("change"));
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   videoPlayer.muted = true;
   videoPlayer.playsInline = true;
