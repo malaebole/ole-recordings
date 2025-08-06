@@ -67,6 +67,9 @@ async function renderPlaylist(category = "camera-1") {
   const bookingId = getQueryParam("booking_id") || null;
   const startTime = getQueryParam("s") || null;
   const endTime = getQueryParam("e") || null;
+  const cameraNo = getQueryParam("c") || null;
+  const cameraId = cameraNo ? `camera-${cameraNo}` : category;
+
   loader.classList.remove("hidden");
 
   let query = "";
@@ -159,7 +162,7 @@ async function renderPlaylist(category = "camera-1") {
       return;
     }
 
-    applyFilter(category);
+    applyFilter(cameraId);
   } catch (err) {
     console.error("Failed to fetch videos:", err);
     loader.classList.add("hidden");
