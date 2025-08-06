@@ -339,6 +339,7 @@ function setActiveCameraFromQuery() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  setActiveCameraFromQuery();
   videoPlayer.muted = true;
   videoPlayer.playsInline = true;
 
