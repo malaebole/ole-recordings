@@ -68,7 +68,7 @@ async function renderPlaylist(category = "camera-1") {
   const startTime = getQueryParam("s") || null;
   const endTime = getQueryParam("e") || null;
   const cameraNo = getQueryParam("c") || null;
-  const cameraId = cameraNo ? `camera-${cameraNo}` : category;
+  const cameraId = cameraNo ? `camera-${+cameraNo}` : category;
 
   loader.classList.remove("hidden");
 
@@ -154,6 +154,9 @@ async function renderPlaylist(category = "camera-1") {
     });
 
     videoList = [...cam1Videos, ...cam2Videos, ...cam3Videos, ...cam4Videos];
+
+    console.log(videoList);
+
     loader.classList.add("hidden");
 
     if (videoList.length === 0) {
@@ -201,6 +204,8 @@ function applyFilter(category) {
 function loadVideoByFilter(index, category) {
   lastSelectedIndex = index;
   currentVideoIndex = index;
+
+  console.log("Video Loaded @", category);
 
   const filtered = videoList.filter((v) => v.category === category);
   if (!filtered[index]) index = 0;
