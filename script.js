@@ -3,6 +3,7 @@ const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
 let currentVideoIndex = 0;
 let lastSelectedIndex = 0;
+let defaultCamera = "camera-1";
 let videoList = [];
 
 function getQueryParam(param) {
@@ -68,7 +69,7 @@ async function renderPlaylist(category = "camera-1") {
   const startTime = getQueryParam("s") || null;
   const endTime = getQueryParam("e") || null;
   const cameraNo = getQueryParam("c") || null;
-  const cameraId = cameraNo ? `camera-${+cameraNo}` : category;
+  defaultCamera = cameraNo ? `camera-${+cameraNo}` : category;
 
   loader.classList.remove("hidden");
 
@@ -155,8 +156,6 @@ async function renderPlaylist(category = "camera-1") {
 
     videoList = [...cam1Videos, ...cam2Videos, ...cam3Videos, ...cam4Videos];
 
-    console.log(videoList);
-
     loader.classList.add("hidden");
 
     if (videoList.length === 0) {
@@ -165,7 +164,7 @@ async function renderPlaylist(category = "camera-1") {
       return;
     }
 
-    applyFilter(cameraId);
+    applyFilter(defaultCamera);
   } catch (err) {
     console.error("Failed to fetch videos:", err);
     loader.classList.add("hidden");
@@ -326,6 +325,8 @@ document.querySelectorAll(".camera-option input").forEach((radio) => {
       return;
     }
     if (this.checked) {
+      defaultCamera = this.value;
+      applyFilter(defaultCamera);
       renderPlaylist(this.value);
     }
   });
