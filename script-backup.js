@@ -6,7 +6,6 @@ let lastSelectedIndex = 0;
 let defaultCamera = "camera-1";
 let videoList = [];
 
-// Helper Functions
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(param);
@@ -64,68 +63,117 @@ function parseCustomDate(str) {
   return new Date(+year, +month - 1, +day, hour, +minute, +second);
 }
 
-// Main Video Functions
-async function fetchAllVideos() {
+async function renderPlaylist(category = "camera-1") {
+  playlistContainer.innerHTML = "";
   const bookingId = getQueryParam("booking_id") || null;
   const startTime = getQueryParam("s") || null;
   const endTime = getQueryParam("e") || null;
+  const cameraNo = getQueryParam("c") || null;
+  defaultCamera = cameraNo ? `camera-${+cameraNo}` : category;
+
+  loader.classList.remove("hidden");
 
   let query = "";
   if (startTime && endTime) {
     query = `?start_time=${encodeURIComponent(
       startTime
     )}&end_time=${encodeURIComponent(endTime)}`;
-  } else if (bookingId) {
-    query = `?booking_id=${bookingId}`;
+  } else {
+    if (bookingId) {
+      query = `?booking_id=${bookingId}`;
+    }
   }
 
-  const urls = [
-    `https://recorder.ole-app.ae/api/camera-1/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-2/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-3/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-4/recordings${query}`,
-  ];
+  const cameraOneURL = `https://recorder.ole-app.ae/api/camera-1/recordings${query}`;
+  const cameraTwoURL = `https://recorder.ole-app.ae/api/camera-2/recordings${query}`;
+  const cameraThreeURL = `https://recorder.ole-app.ae/api/camera-3/recordings${query}`;
+  const cameraFourURL = `https://recorder.ole-app.ae/api/camera-4/recordings${query}`;
 
   try {
-    const responses = await Promise.all(urls.map((url) => fetch(url)));
-    const data = await Promise.all(responses.map((res) => res.json()));
+    const [cam1Res, cam2Res, cam3Res, cam4Res] = await Promise.all([
+      fetch(cameraOneURL),
+      fetch(cameraTwoURL),
+      fetch(cameraThreeURL),
+      fetch(cameraFourURL),
+    ]);
+    const cam1Data = await cam1Res.json();
+    const cam2Data = await cam2Res.json();
+    const cam3Data = await cam3Res.json();
+    const cam4Data = await cam4Res.json();
 
-    videoList = data.flatMap((camData, camIndex) => {
-      return (camData.data || []).map((item, index) => {
-        const dt = formatDateRange(item.start_time, item.end_time);
-        if (camIndex === 0) {
-          document.getElementById("videoDate").textContent = dt.date;
-        }
-        return {
-          title: `Cam${camIndex + 1} - Part ${index + 1}`,
-          url: item.url,
-          category: `camera-${camIndex + 1}`,
-          thumbnail: "thumbnail.png",
-          date: dt.date,
-          time: dt.time,
-          live: false,
-        };
-      });
+    const cam1Videos = (cam1Data.data || []).map((item, index) => {
+      const dt = formatDateRange(item.start_time, item.end_time);
+      document.getElementById("videoDate").textContent = dt.date;
+      return {
+        title: `Cam1 - Part ${index + 1}`,
+        url: item.url,
+        category: "camera-1",
+        thumbnail: "thumbnail.png",
+        date: dt.date,
+        time: dt.time,
+        live: false,
+      };
     });
+
+    const cam2Videos = (cam2Data.data || []).map((item, index) => {
+      const dt = formatDateRange(item.start_time, item.end_time);
+      return {
+        title: `Cam2 - Part ${index + 1}`,
+        url: item.url,
+        category: "camera-2",
+        thumbnail: "thumbnail.png",
+        date: dt.date,
+        time: dt.time,
+        live: false,
+      };
+    });
+
+    const cam3Videos = (cam3Data.data || []).map((item, index) => {
+      const dt = formatDateRange(item.start_time, item.end_time);
+      return {
+        title: `Cam3 - Part ${index + 1}`,
+        url: item.url,
+        category: "camera-3",
+        thumbnail: "thumbnail.png",
+        date: dt.date,
+        time: dt.time,
+        live: false,
+      };
+    });
+
+    const cam4Videos = (cam4Data.data || []).map((item, index) => {
+      const dt = formatDateRange(item.start_time, item.end_time);
+      return {
+        title: `Cam4 - Part ${index + 1}`,
+        url: item.url,
+        category: "camera-4",
+        thumbnail: "thumbnail.png",
+        date: dt.date,
+        time: dt.time,
+        live: false,
+      };
+    });
+
+    videoList = [...cam1Videos, ...cam2Videos, ...cam3Videos, ...cam4Videos];
+
+    loader.classList.add("hidden");
 
     if (videoList.length === 0) {
       playlistContainer.innerHTML =
         "<p>No recordings found for this booking.</p>";
+      return;
     }
+
+    applyFilter(defaultCamera);
   } catch (err) {
     console.error("Failed to fetch videos:", err);
-    playlistContainer.innerHTML = "<p>Error loading playlist.</p>";
-  } finally {
     loader.classList.add("hidden");
+    playlistContainer.innerHTML = "<p>Error loading playlist.</p>";
   }
 }
 
 function applyFilter(category) {
-  const filtered =
-    category === "all"
-      ? videoList
-      : videoList.filter((v) => v.category === category);
-
+  const filtered = videoList.filter((v) => v.category === category);
   playlistContainer.innerHTML = "";
 
   if (filtered.length === 0) {
@@ -156,11 +204,9 @@ function loadVideoByFilter(index, category) {
   lastSelectedIndex = index;
   currentVideoIndex = index;
 
-  const filtered =
-    category === "all"
-      ? videoList
-      : videoList.filter((v) => v.category === category);
+  console.log("Video Loaded @", category);
 
+  const filtered = videoList.filter((v) => v.category === category);
   if (!filtered[index]) index = 0;
   const video = filtered[index];
 
@@ -169,17 +215,31 @@ function loadVideoByFilter(index, category) {
   videoPlayer.load();
   videoPlayer.play().catch((err) => {
     console.warn("Autoplay prevented:", err);
-    videoPlayer.controls = true;
   });
 
-  document.querySelectorAll(".playlist-item").forEach((item, i) => {
+  // Highlight active item
+  const items = document.querySelectorAll(".playlist-item");
+  items.forEach((item, i) => {
     item.classList.toggle("active", i === index);
   });
 
+  // Scroll up to video player
   videoPlayer.scrollIntoView({ behavior: "smooth" });
 }
 
-// Player Control Functions
+videoPlayer.addEventListener("ended", () => {
+  const active =
+    document.querySelector(".camera-option input:checked")?.value || "camera-1";
+  const filtered =
+    active === "all"
+      ? videoList
+      : videoList.filter((v) => v.category === active);
+  const nextIndex = currentVideoIndex + 1;
+  if (nextIndex < filtered.length) {
+    loadVideoByFilter(nextIndex, active);
+  }
+});
+
 function toggleMute() {
   try {
     videoPlayer.muted = !videoPlayer.muted;
@@ -211,15 +271,7 @@ async function enterPiP() {
 }
 
 function downloadVideo() {
-  const activeCamera = document.querySelector(
-    ".camera-option input:checked"
-  ).value;
-  const filtered =
-    activeCamera === "all"
-      ? videoList
-      : videoList.filter((v) => v.category === activeCamera);
-  const currentVideo = filtered[currentVideoIndex];
-
+  const currentVideo = videoList[currentVideoIndex];
   if (currentVideo.live || currentVideo.url.startsWith("rtsp://")) {
     showAlert("Live streams cannot be downloaded");
     return;
@@ -254,7 +306,6 @@ function toggleFullscreen() {
   }
 }
 
-// UI Helper Functions
 function showAlert(message) {
   const alert = document.createElement("div");
   alert.className = "video-alert";
@@ -267,56 +318,64 @@ function sanitizeFilename(name) {
   return name.replace(/[^a-z0-9]/gi, "_").substring(0, 50);
 }
 
-// Camera Selection Handling
+document.querySelectorAll(".camera-option input").forEach((radio) => {
+  radio.addEventListener("change", function () {
+    if (this.value === "live") {
+      showAlert("We are working on it. Coming soon...");
+      return;
+    }
+    if (this.checked) {
+      defaultCamera = this.value;
+      applyFilter(defaultCamera);
+      renderPlaylist(this.value);
+    }
+  });
+});
+
 function setActiveCameraFromQuery() {
-  const cameraNum = getQueryParam("c") || "1";
-  const targetCamera = `camera-${cameraNum}`;
+  const category = getQueryParam("c") || null;
+  const targetCamera = category ? `camera-${category}` : "camera-1";
   const cameraOption = document.querySelector(
     `.camera-option input[value="${targetCamera}"]`
   );
-
   if (cameraOption) {
     cameraOption.checked = true;
-    applyFilter(targetCamera);
+    cameraOption.dispatchEvent(new Event("change"));
   }
 }
 
-function setupCameraControls() {
-  document.querySelectorAll(".camera-option input").forEach((radio) => {
-    radio.addEventListener("change", function () {
-      if (this.value === "live") {
-        showAlert("We are working on it. Coming soon...");
-        return;
-      }
-      if (this.checked) {
-        const url = new URL(window.location);
-        const cameraNum = this.value.split("-")[1];
+document.addEventListener("DOMContentLoaded", () => {
+  setActiveCameraFromQuery();
+  videoPlayer.muted = true;
+  videoPlayer.playsInline = true;
 
-        if (this.value === "camera-1") {
-          url.searchParams.delete("c");
-        } else {
-          url.searchParams.set("c", cameraNum);
-        }
-
-        window.history.pushState({}, "", url);
-        applyFilter(this.value);
-      }
+  const playPromise = videoPlayer.play();
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
+      videoPlayer.controls = true;
+      console.log("Autoplay prevented:", error);
     });
-  });
-}
+  }
 
-// Time Filter Handling
-function setupTimeFilters() {
+  // DateTime Filter inputs
   const startInput = document.getElementById("startTime");
   const endInput = document.getElementById("endTime");
 
-  // Initialize from query params or localStorage
-  const startTime =
-    getQueryParam("s") || localStorage.getItem("filter_start_time");
-  const endTime = getQueryParam("e") || localStorage.getItem("filter_end_time");
+  // first see query params and save time into localstorage
+  const startTime = getQueryParam("s") || null;
+  const endTime = getQueryParam("e") || null;
+  if (startTime && endTime) {
+    localStorage.setItem("filter_start_time", startTime);
+    localStorage.setItem("filter_end_time", endTime);
+    startInput.value = startTime;
+    endInput.value = endTime;
+  } else {
+    const savedStart = localStorage.getItem("filter_start_time");
+    const savedEnd = localStorage.getItem("filter_end_time");
 
-  if (startTime) startInput.value = startTime;
-  if (endTime) endInput.value = endTime;
+    if (savedStart) startInput.value = savedStart;
+    if (savedEnd) endInput.value = savedEnd;
+  }
 
   function isValid30MinStep(dateStr) {
     const date = new Date(dateStr);
@@ -328,8 +387,8 @@ function setupTimeFilters() {
     .getElementById("timeFilterForm")
     .addEventListener("submit", function (e) {
       e.preventDefault();
-      const start = startInput.value;
-      const end = endInput.value;
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
 
       if (!start || !end) {
         showAlert("Please select both start and end time.");
@@ -337,15 +396,16 @@ function setupTimeFilters() {
       }
 
       if (!isValid30MinStep(start) || !isValid30MinStep(end)) {
+        e.preventDefault();
         showAlert("Time must be in 30-minute steps (:00 or :30 only).");
-        return;
       }
 
       if (new Date(start) >= new Date(end)) {
+        e.preventDefault();
         showAlert("End time must be after start time.");
-        return;
       }
 
+      //Save selected datetime to localStorage
       localStorage.setItem("filter_start_time", start);
       localStorage.setItem("filter_end_time", end);
 
@@ -357,60 +417,37 @@ function setupTimeFilters() {
         )} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
       };
 
-      const url = new URL(window.location);
-      url.searchParams.set("s", formatToSQL(start));
-      url.searchParams.set("e", formatToSQL(end));
+      const formattedStart = formatToSQL(start);
+      const formattedEnd = formatToSQL(end);
+
+      const url = new URL(window.location.href);
+      url.searchParams.set("s", formattedStart);
+      url.searchParams.set("e", formattedEnd);
+
+      // remove booking_id if present
       url.searchParams.delete("booking_id");
+
+      // reload page with new query
       window.location.href = url.toString();
     });
 
   document.getElementById("clearSearchTimes")?.addEventListener("click", () => {
-    startInput.value = "";
-    endInput.value = "";
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
+
+    // Remove from localStorage
     localStorage.removeItem("filter_start_time");
     localStorage.removeItem("filter_end_time");
 
+    // Reload page with booking_id fallback
     const bookingId = getQueryParam("booking_id");
-    const url = new URL(window.location);
-    url.searchParams.delete("s");
-    url.searchParams.delete("e");
-    window.location.href = url.toString();
-  });
-}
-
-// Initialize Player
-function initPlayer() {
-  videoPlayer.muted = true;
-  videoPlayer.playsInline = true;
-  videoPlayer.play().catch((err) => {
-    videoPlayer.controls = true;
-    console.log("Autoplay prevented:", err);
-  });
-}
-
-// Main Initialization
-document.addEventListener("DOMContentLoaded", async () => {
-  setupCameraControls();
-  setupTimeFilters();
-  initPlayer();
-
-  loader.classList.remove("hidden");
-  await fetchAllVideos();
-  setActiveCameraFromQuery();
-
-  // Handle video end
-  videoPlayer.addEventListener("ended", () => {
-    const activeCamera = document.querySelector(
-      ".camera-option input:checked"
-    ).value;
-    const filtered =
-      activeCamera === "all"
-        ? videoList
-        : videoList.filter((v) => v.category === activeCamera);
-
-    const nextIndex = currentVideoIndex + 1;
-    if (nextIndex < filtered.length) {
-      loadVideoByFilter(nextIndex, activeCamera);
+    if (bookingId) {
+      window.location.href = `${window.location.pathname}?booking_id=${bookingId}`;
+    } else {
+      window.location.href = window.location.pathname;
     }
   });
+
+  // Default camera-1 videos
+  renderPlaylist("camera-1");
 });
