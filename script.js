@@ -3,7 +3,7 @@ const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
 let currentVideoIndex = 0;
 let lastSelectedIndex = 0;
-let defaultCamera = "camera-1";
+let defaultCamera = "camera-7554";
 let videoList = [];
 
 // Helper Functions
@@ -80,10 +80,10 @@ async function fetchAllVideos() {
   }
 
   const urls = [
-    `https://recorder.ole-app.ae/api/camera-1/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-2/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-3/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-4/recordings${query}`,
+    `https://recorder.ole-app.ae/api/camera-7554/recordings${query}`,
+    `https://recorder.ole-app.ae/api/camera-7555/recordings${query}`,
+    `https://recorder.ole-app.ae/api/camera-7556/recordings${query}`,
+    `https://recorder.ole-app.ae/api/camera-7557/recordings${query}`,
   ];
 
   try {
@@ -292,7 +292,7 @@ function setupCameraControls() {
         const url = new URL(window.location);
         const cameraNum = this.value.split("-")[1];
 
-        if (this.value === "camera-1") {
+        if (this.value === "camera-7554") {
           url.searchParams.delete("c");
         } else {
           url.searchParams.set("c", cameraNum);
