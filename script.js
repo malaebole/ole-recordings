@@ -83,8 +83,9 @@ async function fetchAllVideos() {
     `https://recorder.ole-app.ae/api/camera-7554/recordings${query}`,
     `https://recorder.ole-app.ae/api/camera-7555/recordings${query}`,
     `https://recorder.ole-app.ae/api/camera-7556/recordings${query}`,
-    `https://recorder.ole-app.ae/api/camera-7557/recordings${query}`,
+    // `https://recorder.ole-app.ae/api/camera-7557/recordings${query}`,
   ];
+  const cameraIDMap = { 1: 7554, 2: 7555, 3: 7556, 4: 7557 };
 
   try {
     const responses = await Promise.all(urls.map((url) => fetch(url)));
@@ -96,10 +97,11 @@ async function fetchAllVideos() {
         if (camIndex === 0) {
           document.getElementById("videoDate").textContent = dt.date;
         }
+        const targetCamera = cameraIDMap[camIndex + 1];
         return {
           title: `Cam${camIndex + 1} - Part ${index + 1}`,
           url: item.url,
-          category: `camera-${camIndex + 1}`,
+          category: `camera-${targetCamera}`,
           thumbnail: "thumbnail.png",
           date: dt.date,
           time: dt.time,
