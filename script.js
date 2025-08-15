@@ -233,6 +233,90 @@ function loadVideoByFilter(index, category) {
   videoPlayer.scrollIntoView({ behavior: "smooth" });
 }
 
+function downloadVideo() {
+  try {
+    // Check if we're in dual camera mode (videoPlayer2 has a source)
+    const activeCamera = document.querySelector(
+      ".camera-option input:checked"
+    ).value;
+    const isDualMode =
+      activeCamera === "camera-7554" || activeCamera === "camera-7555";
+
+    if (isDualMode) {
+      // Dual camera download logic
+      const mainVideoUrl = videoPlayer.src;
+      const secondaryVideoUrl = videoPlayer2.src;
+
+      // Find the video objects in videoList that match the current player sources
+      const mainVideo = videoList.find((v) => v.url === mainVideoUrl);
+      const secondaryVideo = videoList.find((v) => v.url === secondaryVideoUrl);
+
+      if (!mainVideo || !secondaryVideo) {
+        showAlert("Could not find video information for download");
+        return;
+      }
+
+      // Check for live streams
+      if (
+        mainVideo.live ||
+        mainVideo.url.startsWith("rtsp://") ||
+        secondaryVideo.live ||
+        secondaryVideo.url.startsWith("rtsp://")
+      ) {
+        showAlert("Live streams cannot be downloaded");
+        return;
+      }
+
+      // Download both videos with a small delay between them
+      const downloadWithDelay = (video, delay) => {
+        setTimeout(() => {
+          const link = document.createElement("a");
+          link.href = video.url;
+          link.download = `${sanitizeFilename(video.title)}.mp4`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }, delay);
+      };
+
+      downloadWithDelay(mainVideo, 0);
+      downloadWithDelay(secondaryVideo, 1000); // 0.5 second delay
+
+      showAlert("Download started for both camera angles");
+    } else {
+      // Single camera download logic
+      const filtered =
+        activeCamera === "all"
+          ? videoList
+          : videoList.filter((v) => v.category === activeCamera);
+
+      const currentVideo = filtered[currentVideoIndex];
+
+      if (!currentVideo) {
+        showAlert("No video found for download");
+        return;
+      }
+
+      if (currentVideo.live || currentVideo.url.startsWith("rtsp://")) {
+        showAlert("Live streams cannot be downloaded");
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = currentVideo.url;
+      link.download = `${sanitizeFilename(currentVideo.title)}.mp4`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showAlert("Download started");
+    }
+  } catch (err) {
+    console.error("Download error:", err);
+    showAlert(`Download failed: ${err.message}`);
+  }
+}
+
 // Player Control Functions
 function toggleMute() {
   try {
@@ -271,83 +355,6 @@ async function enterPiP() {
   } catch (err) {
     console.error("PiP failed:", err);
     showAlert("PiP unavailable: " + err.message);
-  }
-}
-
-function downloadVideo() {
-  const activeCamera = document.querySelector(
-    ".camera-option input:checked"
-  ).value;
-  const isDualCamera =
-    activeCamera === "camera-7554" || activeCamera === "camera-7555";
-
-  try {
-    if (isDualCamera) {
-      // Handle dual camera download
-      const dualCameras = [
-        videoList.find((v) => v.category === "camera-7554"),
-        videoList.find((v) => v.category === "camera-7555"),
-      ].filter(Boolean);
-
-      if (dualCameras.length === 0) {
-        showAlert("No dual camera videos found");
-        return;
-      }
-
-      // Check for live streams
-      const hasLiveStream = dualCameras.some(
-        (video) => video.live || video.url.startsWith("rtsp://")
-      );
-
-      if (hasLiveStream) {
-        showAlert("Cannot download - one or both cameras are live streams");
-        return;
-      }
-
-      console.log(dualCameras);
-
-      // Download both videos
-      dualCameras.forEach((video) => {
-        const link = document.createElement("a");
-        link.href = video.url;
-        link.download = `${sanitizeFilename(video.title)}.mp4`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      });
-
-      showAlert(`Downloading ${dualCameras.length} camera feeds`);
-    } else {
-      // Handle single camera download
-      const filtered =
-        activeCamera === "all"
-          ? videoList
-          : videoList.filter((v) => v.category === activeCamera);
-
-      const currentVideo = filtered[currentVideoIndex];
-
-      if (!currentVideo) {
-        showAlert("No video found for download");
-        return;
-      }
-
-      if (currentVideo.live || currentVideo.url.startsWith("rtsp://")) {
-        showAlert("Live streams cannot be downloaded");
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.href = currentVideo.url;
-      link.download = `${sanitizeFilename(currentVideo.title)}.mp4`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      showAlert("Download started");
-    }
-  } catch (err) {
-    console.error("Download error:", err);
-    showAlert(`Download failed: ${err.message}`);
   }
 }
 
