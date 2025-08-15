@@ -115,18 +115,33 @@
         </form>
       </div>
 
-      <!-- Video Player -->
-      <div class="video-wrapper">
-        <video
-          id="player"
-          controls
-          autoplay
-          muted
-          playsinline
-          webkit-playsinline
-          x-webkit-airplay="allow"
-          preload="auto"
-        ></video>
+      <!-- Dual Video Player Container -->
+      <div class="dual-player-container">
+        <div class="video-wrapper" id="playerOne">
+          <video
+            id="player"
+            controls
+            autoplay
+            muted
+            playsinline
+            webkit-playsinline
+            x-webkit-airplay="allow"
+            preload="auto"
+          ></video>
+        </div>
+
+        <div class="video-wrapper" id="playerTwo">
+          <video
+            id="player2"
+            controls
+            autoplay
+            muted
+            playsinline
+            webkit-playsinline
+            x-webkit-airplay="allow"
+            preload="auto"
+          ></video>
+        </div>
       </div>
 
       <!-- Video Player Controls -->

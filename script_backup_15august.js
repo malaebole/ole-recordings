@@ -1,6 +1,8 @@
 const loader = document.getElementById("loader");
 const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
+
+//Dual Camera script
 const dualPlayerContainer = document.querySelector(".dual-player-container");
 const videoPlayer2 = document.getElementById("player2");
 const dualCameraIds = ["7554", "7555"];
@@ -15,71 +17,7 @@ function getQueryParam(param) {
   return urlParams.get(param);
 }
 
-function currentDateTime() {
-  const now = new Date();
-  const pad = (n) => n.toString().padStart(2, "0");
-  let hours = now.getHours();
-  const minutes = pad(now.getMinutes());
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-  return `${pad(now.getDate())}/${pad(
-    now.getMonth() + 1
-  )}/${now.getFullYear()} ${pad(hours)}:${minutes} ${ampm}`;
-}
-
-function formatDateRange(startStr, endStr) {
-  const startDate = parseCustomDate(startStr);
-  const endDate = parseCustomDate(endStr);
-  if (!startDate || !endDate) {
-    return { date: "Invalid date", time: "Invalid time" };
-  }
-
-  const formatDate = (date) => {
-    return `${String(date.getDate()).padStart(2, "0")}/${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}/${date.getFullYear()}`;
-  };
-
-  const formatTime = (date) => {
-    let hours = date.getHours();
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    return `${hours}:${minutes}${ampm}`;
-  };
-
-  return {
-    date: formatDate(startDate),
-    time: `${formatTime(startDate)}-${formatTime(endDate)}`,
-  };
-}
-
-function parseCustomDate(str) {
-  str = str.trim();
-  const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) ?(AM|PM)$/i;
-  const match = str.match(regex);
-  if (!match) return null;
-  let [_, day, month, year, hour, minute, second, period] = match;
-  hour = parseInt(hour, 10);
-  if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
-  if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
-  return new Date(+year, +month - 1, +day, hour, +minute, +second);
-}
-
-function showAlert(message, duration = 3000) {
-  const alert = document.createElement("div");
-  alert.className = "video-alert";
-  alert.textContent = message;
-  document.body.appendChild(alert);
-  setTimeout(() => alert.remove(), duration);
-}
-
-function sanitizeFilename(name) {
-  return name.replace(/[^a-z0-9]/gi, "_").substring(0, 50);
-}
-
-// Video Loading Functions
+// Main Video Functions
 async function fetchAllVideos() {
   const bookingId = getQueryParam("booking_id") || null;
   const startTime = getQueryParam("s") || null;
@@ -98,8 +36,9 @@ async function fetchAllVideos() {
     `https://recorder.ole-app.ae/api/camera-7554/recordings${query}`,
     `https://recorder.ole-app.ae/api/camera-7555/recordings${query}`,
     `https://recorder.ole-app.ae/api/camera-7556/recordings${query}`,
+    // `https://recorder.ole-app.ae/api/camera-7557/recordings${query}`,
   ];
-  const cameraIDMap = { 1: 7554, 2: 7555, 3: 7556 };
+  const cameraIDMap = { 1: 7554, 2: 7555, 3: 7556, 4: 7557 };
 
   try {
     const responses = await Promise.all(urls.map((url) => fetch(url)));
@@ -137,17 +76,6 @@ async function fetchAllVideos() {
 }
 
 function applyFilter(category) {
-  const cameraId = category.split("-")[1];
-
-  // Toggle player visibility based on camera selection
-  if (dualCameraIds.includes(cameraId)) {
-    document.getElementById("playerOne").classList.remove("hidden");
-    document.getElementById("playerTwo").classList.remove("hidden");
-  } else {
-    document.getElementById("playerOne").classList.remove("hidden");
-    document.getElementById("playerTwo").classList.add("hidden");
-  }
-
   const filtered =
     category === "all"
       ? videoList
@@ -190,42 +118,15 @@ function loadVideoByFilter(index, category) {
 
   if (!filtered[index]) index = 0;
   const video = filtered[index];
-  const cameraId = category.split("-")[1];
 
-  if (dualCameraIds.includes(cameraId)) {
-    // Dual camera mode - find matching video from the other camera
-    const otherCameraId = cameraId === "7554" ? "7555" : "7554";
-    const matchingVideo =
-      videoList.find(
-        (v) => v.category === `camera-${otherCameraId}` && v.time === video.time
-      ) || video; // Fallback to same video if no match found
+  videoPlayer.src = video.url;
+  videoPlayer.muted = true;
+  videoPlayer.load();
+  videoPlayer.play().catch((err) => {
+    console.warn("Autoplay prevented:", err);
+    videoPlayer.controls = true;
+  });
 
-    // Load both players
-    videoPlayer.src = video.url;
-    videoPlayer2.src = matchingVideo.url.replace(cameraId, otherCameraId);
-
-    // Play both videos
-    const playPromises = [
-      videoPlayer.play().catch((e) => console.log("Main player error:", e)),
-      videoPlayer2
-        .play()
-        .catch((e) => console.log("Secondary player error:", e)),
-    ];
-
-    Promise.all(playPromises).then(() => {
-      videoPlayer.controls = true;
-      videoPlayer2.controls = true;
-    });
-  } else {
-    // Single camera mode
-    videoPlayer.src = video.url;
-    videoPlayer.play().catch((e) => {
-      console.log("Player error:", e);
-      videoPlayer.controls = true;
-    });
-  }
-
-  // Update active states
   document.querySelectorAll(".playlist-item").forEach((item, i) => {
     item.classList.toggle("active", i === index);
   });
@@ -236,21 +137,14 @@ function loadVideoByFilter(index, category) {
 // Player Control Functions
 function toggleMute() {
   try {
-    const isDualView = dualCameraIds.includes(
-      document
-        .querySelector(".camera-option input:checked")
-        ?.value?.split("-")[1]
-    );
+    videoPlayer.muted = !videoPlayer.muted;
+    muteIcon.textContent = videoPlayer.muted ? "🔇" : "🔊";
 
-    const players = isDualView ? [videoPlayer, videoPlayer2] : [videoPlayer];
-    const newMutedState = !videoPlayer.muted;
-
-    players.forEach((player) => {
-      player.muted = newMutedState;
-    });
-
-    muteIcon.textContent = newMutedState ? "🔇" : "🔊";
-    showAlert(newMutedState ? "Muted" : "Unmuted", 1000);
+    const feedback = document.createElement("div");
+    feedback.textContent = videoPlayer.muted ? "Muted" : "Unmuted";
+    feedback.className = `control-feedback ${videoPlayer.muted ? "muted" : ""}`;
+    document.body.appendChild(feedback);
+    setTimeout(() => feedback.remove(), 1000);
   } catch (err) {
     console.error("Mute toggle failed:", err);
   }
@@ -261,10 +155,7 @@ async function enterPiP() {
     if (document.pictureInPictureElement) {
       await document.exitPictureInPicture();
     } else if (document.pictureInPictureEnabled) {
-      const targetPlayer = dualPlayerContainer.classList.contains("hidden")
-        ? videoPlayer
-        : videoPlayer2;
-      await targetPlayer.requestPictureInPicture();
+      await videoPlayer.requestPictureInPicture();
     } else {
       showAlert("PiP not supported in your browser");
     }
@@ -307,10 +198,7 @@ function downloadVideo() {
 function toggleFullscreen() {
   try {
     if (!document.fullscreenElement) {
-      const targetElement = dualPlayerContainer.classList.contains("hidden")
-        ? videoPlayer
-        : dualPlayerContainer;
-      targetElement.requestFullscreen().catch((err) => {
+      videoPlayer.requestFullscreen().catch((err) => {
         showAlert("Fullscreen failed: " + err.message);
       });
     } else {
@@ -319,6 +207,19 @@ function toggleFullscreen() {
   } catch (err) {
     console.error("Fullscreen error:", err);
   }
+}
+
+// UI Helper Functions
+function showAlert(message) {
+  const alert = document.createElement("div");
+  alert.className = "video-alert";
+  alert.textContent = message;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 3000);
+}
+
+function sanitizeFilename(name) {
+  return name.replace(/[^a-z0-9]/gi, "_").substring(0, 50);
 }
 
 // Camera Selection Handling
@@ -434,29 +335,11 @@ function setupTimeFilters() {
 
 // Initialize Player
 function initPlayer() {
-  [videoPlayer, videoPlayer2].forEach((player) => {
-    player.muted = true;
-    player.playsInline = true;
-    player.play().catch((err) => {
-      player.controls = true;
-      console.log("Autoplay prevented:", err);
-    });
-  });
-
-  // Sync playback between players in dual view
-  videoPlayer.addEventListener("play", () => {
-    if (
-      !dualPlayerContainer.classList.contains("hidden") &&
-      videoPlayer2.paused
-    ) {
-      videoPlayer2.play().catch((e) => console.log("Sync play error:", e));
-    }
-  });
-
-  videoPlayer2.addEventListener("play", () => {
-    if (videoPlayer.paused) {
-      videoPlayer.play().catch((e) => console.log("Sync play error:", e));
-    }
+  videoPlayer.muted = true;
+  videoPlayer.playsInline = true;
+  videoPlayer.play().catch((err) => {
+    videoPlayer.controls = true;
+    console.log("Autoplay prevented:", err);
   });
 }
 
@@ -486,3 +369,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
+function currentDateTime() {
+  const now = new Date();
+  const pad = (n) => n.toString().padStart(2, "0");
+  let hours = now.getHours();
+  const minutes = pad(now.getMinutes());
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  return `${pad(now.getDate())}/${pad(
+    now.getMonth() + 1
+  )}/${now.getFullYear()} ${pad(hours)}:${minutes} ${ampm}`;
+}
+
+function formatDateRange(startStr, endStr) {
+  const startDate = parseCustomDate(startStr);
+  const endDate = parseCustomDate(endStr);
+  if (!startDate || !endDate) {
+    return { date: "Invalid date", time: "Invalid time" };
+  }
+
+  const formatDate = (date) => {
+    return `${String(date.getDate()).padStart(2, "0")}/${String(
+      date.getMonth() + 1
+    ).padStart(2, "0")}/${date.getFullYear()}`;
+  };
+
+  const formatTime = (date) => {
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes}${ampm}`;
+  };
+
+  return {
+    date: formatDate(startDate),
+    time: `${formatTime(startDate)}-${formatTime(endDate)}`,
+  };
+}
+
+function parseCustomDate(str) {
+  str = str.trim();
+  const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{1,2}):(\d{2}):(\d{2}) ?(AM|PM)$/i;
+  const match = str.match(regex);
+  if (!match) return null;
+  let [_, day, month, year, hour, minute, second, period] = match;
+  hour = parseInt(hour, 10);
+  if (period.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (period.toUpperCase() === "AM" && hour === 12) hour = 0;
+  return new Date(+year, +month - 1, +day, hour, +minute, +second);
+}
