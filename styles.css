@@ -198,8 +198,9 @@ h1 {
 
 video {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto; /* ✅ prevents cutting */
+  max-height: 90vh; /* ✅ never exceed viewport height */
+  object-fit: contain; /* ✅ keep full video visible */
   display: block;
   border-radius: 8px;
 }
@@ -382,8 +383,10 @@ video {
 @media (max-width: 768px) {
   .dual-player-container {
     flex-direction: column;
+    gap: 10px;
   }
   .dual-player-container .video-wrapper {
+    aspect-ratio: auto; /* ✅ let video define size */
     width: 100%;
   }
   h1 {
