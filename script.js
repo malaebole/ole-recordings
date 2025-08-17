@@ -3,6 +3,7 @@ const videoPlayer = document.getElementById("player");
 const playlistContainer = document.getElementById("playlist");
 const dualPlayerContainer = document.querySelector(".dual-player-container");
 const videoPlayer2 = document.getElementById("player2");
+const noVideo = document.querySelector(".no-video");
 const dualCameraIds = ["7554", "7555"];
 
 let currentVideoIndex = 0;
@@ -157,6 +158,9 @@ function applyFilter(category) {
 
   if (filtered.length === 0) {
     playlistContainer.innerHTML = "";
+    if (noVideo && noVideo.classList.contains("hidden")) {
+      noVideo.classList.remove("hidden");
+    }
     return;
   }
 
@@ -231,6 +235,7 @@ function loadVideoByFilter(index, category) {
   });
 
   videoPlayer.scrollIntoView({ behavior: "smooth" });
+  noVideo.classList.add("hidden");
 }
 
 function downloadVideo() {
