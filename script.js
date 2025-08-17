@@ -156,7 +156,7 @@ function applyFilter(category) {
   playlistContainer.innerHTML = "";
 
   if (filtered.length === 0) {
-    playlistContainer.innerHTML = "<p>No videos for selected camera.</p>";
+    playlistContainer.innerHTML = "";
     return;
   }
 
